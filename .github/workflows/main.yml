@@ -1,0 +1,43 @@
+name: Run daku Workflow
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '*/30 * * * *'
+
+concurrency:
+  group: run_daku_workflow
+
+jobs:
+  run_daku_workflow:
+    runs-on: ubuntu_latest
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v2
+
+      - name: binary by @daku
+        run: chmod +x daku
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.x'
+
+      - name: Install required packages
+        run: |
+          pip install python-telegram-bot --upgrade
+          pip install telebot flask aiogram pyTelegramBotAPI python-telegram-bot
+          pip install telebot pymongo aiohttp psutil
+          pip install motor
+          pip install nest_asyncio
+          pip install pytz
+
+      - name: Run daku.py
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+        run: python3 daku.py
+        
